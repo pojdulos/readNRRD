@@ -7,13 +7,10 @@ import json
 
 from consts import SRC_ROOT, SEGMENTED_STRUCTURE, DST_ROOT, REGION_DATA_FILE, SEPARATE_SAMPLES, IMG_FORMAT
 
-# UWAGA ZUOOO! Zmienna globalna...
-imgPrefix = '' # wartosć jest modyfikowana w funkcji processSample()
+def getImgFileName(img_prefix, i):
+    return f"{img_prefix}_{i:03d}{IMG_FORMAT}"
 
-def getImgFileName(i):
-    return f"{imgPrefix}_{i:03d}{IMG_FORMAT}"
-
-def convertToJPG(srcFile, dstFolder):
+def convertToJPG(srcFile, dstFolder, img_prefix):
     image = sitk.ReadImage(srcFile)
     image_array = sitk.GetArrayFromImage(image)
 
@@ -21,7 +18,7 @@ def convertToJPG(srcFile, dstFolder):
        os.makedirs(dstFolder)
 
     for i in range(image_array.shape[0]):
-        imgFile = getImgFileName(i)
+        imgFile = getImgFileName(img_prefix, i)
         cv2.imwrite(os.path.join(dstFolder,imgFile), image_array[i, :, :])
 
 def plotImage(image,contours):
@@ -52,7 +49,7 @@ def getRegionsObject(contours):
     return result
     
 
-def dumpRegionData(srcFile, dstFolder):
+def dumpRegionData(srcFile, dstFolder, img_prefix):
     image = sitk.ReadImage(srcFile)
     image_array = sitk.GetArrayFromImage(image)
 
@@ -73,7 +70,7 @@ def dumpRegionData(srcFile, dstFolder):
     for i in range(image_array.shape[0]):
         contours, _ = cv2.findContours(image_array[i, :, :], cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 
-        imgFile = getImgFileName(i)
+        imgFile = getImgFileName(img_prefix, i)
         imgFilePath = os.path.join(dstFolder,imgFile)
         imgFileSize = os.path.getsize(imgFilePath)
 
@@ -95,22 +92,20 @@ def dumpRegionData(srcFile, dstFolder):
     
 
 def processSample(sample):
-    global imgPrefix
-    
     srcFile = os.path.join(SRC_ROOT, sample, "img.nrrd")
     mandibleFile = os.path.join(SRC_ROOT, sample, "structures", SEGMENTED_STRUCTURE+".nrrd")
 
     # przetwarzam tylko te modele w których jest wysegmentowana zuchwa
     if os.path.exists(srcFile) and os.path.exists(mandibleFile):
-        imgPrefix = f"img{sample}"
-        
         if SEPARATE_SAMPLES:
             dstDir = os.path.join(DST_ROOT, sample)
         else:
             dstDir = DST_ROOT
         
-        convertToJPG(srcFile, dstDir)
-        dumpRegionData(mandibleFile, dstDir)
+        img_prefix = f"img{sample}"
+
+        convertToJPG(srcFile, dstDir, img_prefix)
+        dumpRegionData(mandibleFile, dstDir, img_prefix)
     
     
 def main():
@@ -121,7 +116,7 @@ def main():
             pass
 
     for (dirpath, dirnames, filenames) in os.walk(SRC_ROOT):
-        for sample in dirnames: #[0:3]:
+        for sample in dirnames: # [0:3]:
             processSample(sample)
     
 
