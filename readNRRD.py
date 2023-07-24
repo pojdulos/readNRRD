@@ -121,7 +121,7 @@ def main():
             pass
 
     for (dirpath, dirnames, filenames) in os.walk(SRC_ROOT):
-        for sample in dirnames[0:3]:
+        for sample in dirnames: #[0:3]:
             processSample(sample)
     
 
