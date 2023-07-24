@@ -5,22 +5,10 @@ import cv2
 import os
 import json
 
+from consts import SRC_ROOT, SEGMENTED_STRUCTURE, DST_ROOT, REGION_DATA_FILE, SEPARATE_SAMPLES, IMG_FORMAT
 
-SRC_ROOT = 'd:/darekp/PDDCA/'
-SEGMENTED_STRUCTURE = 'Mandible'
-
-DST_ROOT = 'output/'
-REGION_DATA_FILE = 'via_region_data.json'
-
-# True  - tworzy oddzielny podkatalog dla każdego modelu z własnym plikiem via_region_data.json
-# False - zapisuje wszystko jak leci do DST_ROOT i tworzy jeden wspólny plik via_region_data.json
-SEPARATE_SAMPLES = True
-
-IMG_FORMAT = '.jpg' # mozna zapisywac do dowolnego formatu obsługiwanego przez cv2.imwrite()
-
-# ZUUUUO: zmienna globalna ;-)
+# UWAGA ZUOOO! Zmienna globalna...
 imgPrefix = '' # wartosć jest modyfikowana w funkcji processSample()
-
 
 def getImgFileName(i):
     return f"{imgPrefix}_{i:03d}{IMG_FORMAT}"

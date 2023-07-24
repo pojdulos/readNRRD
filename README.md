@@ -10,10 +10,10 @@ Program w oparciu o zawartość pliku img.nrrd generuje pliki graficzne
 PRZED UŻYCIEM
 -------------
 
-Należy zmodyfikować stałe: SRC_ROOT oraz DST_ROOT według swoich potrzeb.
+Aby ustawić poprawne scieżki dostępu należy w pliku consts.py zmodyfikować
+stałe SRC_ROOT oraz DST_ROOT według swoich potrzeb.
 
 Opis jest tworzony tylko dla jednej wysegmentowanej struktury
 (domyślnie żuchwy: 'Mandible'). Można wybrać inna strukturę modyfikując
-stałą SEGMENTED_STRUCTURE. Należy jej przypisać nazwę odpowiedniego pliku
-z katalogu structures bez rozszerzenia.
-
+w pliku consts.py stałą SEGMENTED_STRUCTURE. Należy jej przypisać nazwę
+odpowiedniego pliku z katalogu structures bez rozszerzenia.
