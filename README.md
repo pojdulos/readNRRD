@@ -1,16 +1,19 @@
 readNRRD
 ========
 
-konwertuje dane wolumetryczne z bazy PDDCA w formacie .nrrd do postaci akceptowalnej przez Detectron
+konwertuje dane wolumetryczne z bazy PDDCA w formacie .nrrd do postaci
+akceptowalnej przez Detectron
 
-Program w oparciu o zawartość pliku img.nrrd generuje pliki graficzne (domyślnie .jpg) oraz tworzy plik opisu via_region_data.json
-
-UWAGA
------
-
-W obecnej wersji opis jest tworzony tylko dla wysegmentowanej żuchwy (z pliku Mandible.nrrd).
+Program w oparciu o zawartość pliku img.nrrd generuje pliki graficzne
+(domyślnie .jpg) oraz tworzy plik opisu via_region_data.json
 
 PRZED UŻYCIEM
 -------------
 
-W celu użycia należy zmodyfikować w źródle stałe: SRC_ROOT oraz DST_ROOT według swoich potrzeb
+Należy zmodyfikować stałe: SRC_ROOT oraz DST_ROOT według swoich potrzeb.
+
+Opis jest tworzony tylko dla jednej wysegmentowanej struktury
+(domyślnie żuchwy: 'Mandible'). Można wybrać inna strukturę modyfikując
+stałą SEGMENTED_STRUCTURE. Należy jej przypisać nazwę odpowiedniego pliku
+z katalogu structures bez rozszerzenia.
+

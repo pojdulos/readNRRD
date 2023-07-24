@@ -7,6 +7,8 @@ import json
 
 
 SRC_ROOT = 'd:/darekp/PDDCA/'
+SEGMENTED_STRUCTURE = 'Mandible'
+
 DST_ROOT = 'output/'
 REGION_DATA_FILE = 'via_region_data.json'
 
@@ -108,7 +110,7 @@ def processSample(sample):
     global imgPrefix
     
     srcFile = os.path.join(SRC_ROOT, sample, "img.nrrd")
-    mandibleFile = os.path.join(SRC_ROOT, sample, "structures", "Mandible.nrrd")
+    mandibleFile = os.path.join(SRC_ROOT, sample, "structures", SEGMENTED_STRUCTURE+".nrrd")
 
     # przetwarzam tylko te modele w których jest wysegmentowana zuchwa
     if os.path.exists(srcFile) and os.path.exists(mandibleFile):
@@ -131,7 +133,7 @@ def main():
             pass
 
     for (dirpath, dirnames, filenames) in os.walk(SRC_ROOT):
-        for sample in dirnames: #[0:3]:
+        for sample in dirnames[0:3]:
             processSample(sample)
     
 
