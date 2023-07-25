@@ -5,7 +5,8 @@ import cv2
 import os
 import json
 
-from consts import SRC_ROOT, SEGMENTED_STRUCTURE, DST_ROOT, REGION_DATA_FILE, SEPARATE_SAMPLES, IMG_FORMAT
+from consts import SRC_ROOT, SEGMENTED_STRUCTURE, DST_ROOT, REGION_DATA_FILE, \
+    SEPARATE_SAMPLES, IMG_FORMAT, TRANSPOSE, AXES
 
 def getImgFileName(img_prefix, i):
     return f"{img_prefix}_{i:03d}{IMG_FORMAT}"
@@ -17,9 +18,17 @@ def convertToJPG(srcFile, dstFolder, img_prefix):
     if not os.path.exists(dstFolder):
        os.makedirs(dstFolder)
 
-    for i in range(image_array.shape[0]):
-        imgFile = getImgFileName(img_prefix, i)
-        cv2.imwrite(os.path.join(dstFolder,imgFile), image_array[i, :, :])
+    if not TRANSPOSE:
+        order = [AXES[0]]
+    else:
+        order = AXES
+
+    for o in order:
+        image_array = perform_transpose(image_array, o)
+
+        for i in range(image_array.shape[0]):
+            imgFile = getImgFileName(img_prefix, i)
+            cv2.imwrite(os.path.join(dstFolder,imgFile.replace(IMG_FORMAT, f'_{o[0]}{IMG_FORMAT}')), image_array[i, :, :])
 
 def plotImage(image,contours):
     plt.imshow(image, cmap='gray', vmin=0, vmax=255 )
@@ -67,21 +76,29 @@ def dumpRegionData(srcFile, dstFolder, img_prefix):
         except FileNotFoundError:
             jsonObject = {}
 
-    for i in range(image_array.shape[0]):
-        contours, _ = cv2.findContours(image_array[i, :, :], cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    if not TRANSPOSE:
+        order = [AXES[0]]
+    else:
+        order = AXES
 
-        imgFile = getImgFileName(img_prefix, i)
-        imgFilePath = os.path.join(dstFolder,imgFile)
-        imgFileSize = os.path.getsize(imgFilePath)
+    for o in order:
+        image_array = perform_transpose(image_array, o)
 
-        jsonObject[f"{imgFile}{imgFileSize}"] = {
-            'fileref': "",
-            'size': imgFileSize,
-            'filename': imgFile,
-            'base64_img_data': "",
-            'file_attributes': {},
-            'regions': getRegionsObject(contours)
-        }
+        for i in range(image_array.shape[0]):
+            contours, _ = cv2.findContours(image_array[i, :, :], cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
+            imgFile = getImgFileName(img_prefix, i)
+            imgFilePath = os.path.join(dstFolder,imgFile.replace(IMG_FORMAT, f'_{o[0]}{IMG_FORMAT}'))
+            imgFileSize = os.path.getsize(imgFilePath)
+
+            jsonObject[f"{imgFile}{imgFileSize}"] = {
+                'fileref': "",
+                'size': imgFileSize,
+                'filename': imgFilePath.split('/')[-1],
+                'base64_img_data': "",
+                'file_attributes': {},
+                'regions': getRegionsObject(contours)
+            }
 
         # opcjonalnie można sobie wyswietlić plastry z naniesionymi konturami
         # (jeli są), uwaga: mocno spowalnia działanie
@@ -106,6 +123,10 @@ def processSample(sample):
 
         convertToJPG(srcFile, dstDir, img_prefix)
         dumpRegionData(mandibleFile, dstDir, img_prefix)
+
+
+def perform_transpose(image_array, order):
+    return image_array.transpose(order)
     
     
 def main():
